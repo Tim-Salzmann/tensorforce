@@ -29,21 +29,21 @@ class Replay(Queue):
         capacity = tf.constant(value=self.capacity, dtype=util.tf_dtype(dtype='long'))
 
         # Start index of oldest episode
-        oldest_episode_start = self.terminal_indices[0] + one
+        oldest_episode_start = tf.constant(value=self.capacity, dtype=util.tf_dtype(dtype='long'))#self.terminal_indices[0] + one
 
         # Number of timesteps (minus/plus one to prevent zero but allow capacity)
         num_timesteps = self.memory_index - oldest_episode_start - one
         num_timesteps = tf.mod(x=num_timesteps, y=capacity) + one
 
         # Check whether memory contains enough timesteps
-        assertion = tf.debugging.assert_less_equal(x=n, y=num_timesteps)
+        #assertion = tf.debugging.assert_less_equal(x=n, y=num_timesteps)
 
         # Randomly sampled timestep indices
-        with tf.control_dependencies(control_inputs=(assertion,)):
-            indices = tf.random_uniform(
-                shape=(n,), maxval=num_timesteps, dtype=util.tf_dtype(dtype='long')
-            )
-            indices = tf.mod(x=(self.memory_index - one - indices), y=capacity)
+        #with tf.control_dependencies(control_inputs=(assertion,)):
+        indices = tf.random_uniform(
+            shape=(n,), maxval=num_timesteps, dtype=util.tf_dtype(dtype='long')
+        )
+        indices = tf.mod(x=(self.memory_index - one - indices), y=capacity)
 
         # Retrieve timestep indices
         timesteps = self.retrieve_indices(indices=indices)

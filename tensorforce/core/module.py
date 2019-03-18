@@ -574,7 +574,7 @@ class Module(object):
         # default
         if default is not None:
             if batched:
-                raise TensorforceError.unexpected()
+                pass#raise TensorforceError.unexpected()
             elif not isinstance(default, tf.Tensor):
                 raise TensorforceError.unexpected()
             elif util.dtype(x=default) != dtype:
@@ -583,9 +583,11 @@ class Module(object):
         # Placeholder
         if batched:
             shape = (None,) + shape
+        dtype = util.tf_dtype(dtype=dtype)
         if default is None:
-            dtype = util.tf_dtype(dtype=dtype)
             placeholder = tf.placeholder(dtype=dtype, shape=shape, name=name)
+        elif batched:
+            placeholder = tf.placeholder_with_default(input=[[0]], shape=shape, name=name)
         else:
             # check dtype and shape !!!
             placeholder = tf.placeholder_with_default(input=default, shape=shape, name=name)

@@ -39,11 +39,13 @@ class DRLAgent(Agent):
             self.model.import_experience(**experiences)
 
         else:
+            if len(experiences) == 0:
+                return
             if self.unique_state:
                 states = dict(state=list())
             else:
                 states = {name: list() for name in experiences[0]['states']}
-            internals = [list() for _ in experiences[0]['internals']]
+            #internals = [list() for _ in experiences[0]['internals']]
             if self.unique_action:
                 actions = dict(action=list())
             else:
@@ -57,8 +59,8 @@ class DRLAgent(Agent):
                 else:
                     for name in sorted(states):
                         states[name].append(experience['states'][name])
-                for n, internal in enumerate(internals):
-                    internal.append(experience['internals'][n])
+                # for n, internal in enumerate(internals):
+                #     internal.append(experience['internals'][n])
                 if self.unique_action:
                     actions['action'].append(experience['actions'])
                 else:
@@ -69,7 +71,6 @@ class DRLAgent(Agent):
 
             self.model.import_experience(
                 states=states,
-                internals=internals,
                 actions=actions,
                 terminal=terminal,
                 reward=reward

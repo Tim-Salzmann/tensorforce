@@ -40,6 +40,7 @@ class QModel(DistributionModel):
         # QModel
         target_sync_frequency, target_update_weight, double_q_model, huber_loss
     ):
+        self.fn_import_experience = None
         super().__init__(
             # Model
             states=states, actions=actions, scope=scope, device=device, saver=saver,

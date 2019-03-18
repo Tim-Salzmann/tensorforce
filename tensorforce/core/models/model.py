@@ -220,11 +220,26 @@ class Model(Module):
         self.internals_init = OrderedDict()
 
         # States
+        self.actions_import_input = OrderedDict()
+        for name, actions_spec in self.actions_spec.items():
+            self.actions_import_input[name] = self.add_placeholder(
+                name=name, dtype=actions_spec['type'], shape=actions_spec['shape'], batched=True, default=True
+            )
+
+        # States
         self.states_input = OrderedDict()
         for name, state_spec in self.states_spec.items():
             self.states_input[name] = self.add_placeholder(
                 name=name, dtype=state_spec['type'], shape=state_spec['shape'], batched=True
             )
+
+        self.internals_input = OrderedDict()
+        for name, internals_spec in self.internals_spec.items():
+            self.internals_input[name] = self.add_placeholder(
+                name=name, dtype=internals_spec['type'], shape=internals_spec['shape'], batched=True
+            )
+        if len(self.internals_spec) == 0:
+            self.internals_input = dict()
 
         # Terminal  (default: False?)
         self.terminal_input = self.add_placeholder(
@@ -1229,6 +1244,38 @@ class Model(Module):
 
         self.saver.restore(sess=self.session, save_path=save_path)
         return self.reset()
+
+    def tf_core_import_experience(self, states, actions, terminal, reward):
+        """
+        Imports a single experience to memory.
+        """
+        return self.memory.store(
+            states=states,
+            internals=dict(),
+            actions=actions,
+            terminal=terminal,
+            reward=reward
+        )
+
+    def api_import_experience(self):
+        states = self.states_input
+        actions = self.actions_import_input
+        terminal = self.terminal_input
+        reward = self.reward_input
+
+        store = self.core_import_experience(
+            states=states,
+            actions=actions,
+            terminal=terminal,
+            reward=reward
+        )
+
+        output = util.identity_operation(
+                    x=store, operation_name=('import_experience-output')
+                )
+
+        return output
+
 
     # def save_component(self, component_name, save_path):
     #     """
