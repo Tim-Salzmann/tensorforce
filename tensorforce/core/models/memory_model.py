@@ -462,7 +462,7 @@ class MemoryModel(Model):
             batch_size = self.update_batch_size.value()
             frequency = self.update_frequency.value()
             start = self.update_start.value()
-            start = tf.maximum(x=start, y=batch_size)
+            start = start #tf.maximum(x=start, y=batch_size)
 
             if self.update_unit == 'timesteps':
                 # Timestep-based batch

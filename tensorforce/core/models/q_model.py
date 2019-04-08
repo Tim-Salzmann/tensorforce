@@ -196,8 +196,11 @@ class QModel(DistributionModel):
 
             deltas.append(delta)
 
+            p3 = tf.print([[tf.reduce_min(reward), tf.reduce_max(reward)], [tf.reduce_min(q_value), tf.reduce_max(q_value)], [tf.reduce_min(delta), tf.reduce_max(delta), tf.reduce_mean(tf.abs(delta))]])
+
+        with tf.control_dependencies((p3,)):
         # Surrogate loss as the mean squared error between actual observed rewards and expected rewards
-        loss_per_instance = tf.reduce_mean(input_tensor=tf.concat(values=deltas, axis=1), axis=1)
+            loss_per_instance = tf.reduce_mean(input_tensor=tf.concat(values=deltas, axis=1), axis=1)
 
         # Optional Huber loss
         huber_loss = self.huber_loss.value()
@@ -205,9 +208,17 @@ class QModel(DistributionModel):
         def no_huber_loss():
             return tf.square(x=loss_per_instance)
 
+        # def apply_huber_loss():
+        #     return tf.where(
+        #         condition=(tf.abs(x=loss_per_instance) <= huber_loss),
+        #         x=(0.5 * tf.square(x=loss_per_instance)),
+        #         y=(huber_loss * (tf.abs(x=loss_per_instance) - 0.5 * huber_loss))
+        #     )
+
+        # huber loss only for positive rewards
         def apply_huber_loss():
             return tf.where(
-                condition=(tf.abs(x=loss_per_instance) <= huber_loss),
+                    condition=loss_per_instance <= huber_loss,
                 x=(0.5 * tf.square(x=loss_per_instance)),
                 y=(huber_loss * (tf.abs(x=loss_per_instance) - 0.5 * huber_loss))
             )

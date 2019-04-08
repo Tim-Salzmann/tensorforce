@@ -29,7 +29,7 @@ class Replay(Queue):
         capacity = tf.constant(value=self.capacity, dtype=util.tf_dtype(dtype='long'))
 
         # Start index of oldest episode
-        oldest_episode_start = tf.constant(value=self.capacity, dtype=util.tf_dtype(dtype='long'))#self.terminal_indices[0] + one
+        oldest_episode_start = self.terminal_indices[0] + one
 
         # Number of timesteps (minus/plus one to prevent zero but allow capacity)
         num_timesteps = self.memory_index - oldest_episode_start - one
