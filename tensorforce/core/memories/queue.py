@@ -133,16 +133,16 @@ class Queue(Memory):
         # instances fit into memory
         assertions.append(tf.debugging.assert_less_equal(x=num_timesteps, y=capacity))
         # at most one terminal
-        assertions.append(
-            tf.debugging.assert_less_equal(
-                x=tf.math.count_nonzero(input_tensor=terminal, dtype=util.tf_dtype(dtype='long')),
-                y=one
-            )
-        )
-        # if terminal, last timestep in batch
-        assertions.append(
-            tf.debugging.assert_equal(x=tf.math.reduce_any(input_tensor=terminal), y=terminal[-1])
-        )
+        # assertions.append(
+        #     tf.debugging.assert_less_equal(
+        #         x=tf.math.count_nonzero(input_tensor=terminal, dtype=util.tf_dtype(dtype='long')),
+        #         y=one
+        #     )
+        # )
+        # # if terminal, last timestep in batch
+        # assertions.append(
+        #     tf.debugging.assert_equal(x=tf.math.reduce_any(input_tensor=terminal), y=terminal[-1])
+        # )
 
         # Memory indices to overwrite
         with tf.control_dependencies(control_inputs=assertions):
