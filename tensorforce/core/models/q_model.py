@@ -197,7 +197,7 @@ class QModel(DistributionModel):
             deltas.append(delta)
 
             p3 = tf.print([[tf.reduce_min(reward), tf.reduce_max(reward)],
-                           [tf.reduce_min(q_value), tf.reduce_max(q_value), tf.reduce_mean(tf.abs(q_value)), tf.gather(actions[name],tf.argmax(q_value)), tf.gather(states['trading_state'],tf.argmax(q_value)),  tf.gather(terminal,tf.argmax(q_value)),  tf.gather(next_states['trading_state'],tf.argmax(q_value))],
+                           [tf.reduce_min(q_value), tf.reduce_max(q_value), tf.reduce_mean(tf.abs(q_value)), tf.gather(actions[name],tf.argmax(q_value)), tf.gather(states['position'],tf.argmax(q_value)),  tf.gather(terminal,tf.argmax(q_value)),  tf.gather(next_states['position'],tf.argmax(q_value))],
                            [tf.reduce_min(delta), tf.reduce_max(delta), tf.reduce_mean(tf.abs(delta))]])
 
         with tf.control_dependencies((p3,)):
@@ -210,20 +210,20 @@ class QModel(DistributionModel):
         def no_huber_loss():
             return tf.square(x=loss_per_instance)
 
-        def apply_huber_loss():
-            return tf.where(
-                condition=(tf.abs(x=loss_per_instance) <= huber_loss),
-                x=(0.5 * tf.square(x=loss_per_instance)),
-                y=(huber_loss * (tf.abs(x=loss_per_instance) - 0.5 * huber_loss))
-            )
-
-        # huber loss only for positive rewards
         # def apply_huber_loss():
         #     return tf.where(
-        #             condition=loss_per_instance <= huber_loss,
+        #         condition=(tf.abs(x=loss_per_instance) <= huber_loss),
         #         x=(0.5 * tf.square(x=loss_per_instance)),
         #         y=(huber_loss * (tf.abs(x=loss_per_instance) - 0.5 * huber_loss))
         #     )
+
+        # xhuber loss only for positive rewards
+        def apply_huber_loss():
+            return tf.where(
+                    condition=loss_per_instance <= huber_loss,
+                x=(0.5 * tf.square(x=loss_per_instance)),
+                y=(huber_loss * (tf.abs(x=loss_per_instance) - 0.5 * huber_loss))
+            )
 
         zero = tf.constant(value=0.0, dtype=util.tf_dtype(dtype='float'))
         skip_huber_loss = tf.math.equal(x=huber_loss, y=zero)

@@ -146,8 +146,8 @@ class Conv2d(TransformationBase):
             )
         elif self.padding == 'VALID':
             shape = (
-                ceil((input_spec['shape'][0] - (self.window[1] - 1)) / self.stride[1]),
-                ceil((input_spec['shape'][1] - (self.window[2] - 1)) / self.stride[2])
+                ceil((input_spec['shape'][0] - (self.window[0] - 1)) / self.stride[1]),
+                ceil((input_spec['shape'][1] - (self.window[1] - 1)) / self.stride[2])
             )
 
         if self.squeeze:

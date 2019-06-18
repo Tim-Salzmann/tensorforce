@@ -211,7 +211,7 @@ class Pool2d(Layer):
 
         return input_spec
 
-    def tf_apply(self, x, update):
+    def tf_apply(self, x):
         if self.reduction == 'average':
             x = tf.nn.avg_pool(value=x, ksize=self.window, strides=self.stride, padding=self.padding)
 
